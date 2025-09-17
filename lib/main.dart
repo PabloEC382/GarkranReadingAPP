@@ -414,8 +414,8 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _adicionarLivro,
-        child: const Icon(Icons.add),
         tooltip: 'Adicionar Livro',
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -433,7 +433,7 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
 class LivroDialog extends StatefulWidget {
   final Livro? livro;
 
-  LivroDialog({this.livro});
+  const LivroDialog({super.key, this.livro});
 
   @override
   State<LivroDialog> createState() => _LivroDialogState();
@@ -522,7 +522,7 @@ class _LivroDialogState extends State<LivroDialog> {
                   'Disponível',
                   style: TextStyle(color: azulEscuro),
                 ),
-                activeColor: amarelo,
+                activeThumbColor: amarelo,
                 inactiveThumbColor: magenta,
                 value: disponivel,
                 onChanged: (value) {
