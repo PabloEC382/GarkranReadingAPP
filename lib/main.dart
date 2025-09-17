@@ -300,7 +300,7 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Sistema Livros',
+          'Catálogo',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
@@ -325,88 +325,86 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
                       textAlign: TextAlign.center,
                       softWrap: true,
                     )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: livros.length,
-                      itemBuilder: (context, index) {
-                        final livro = livros[index];
-                        return Card(
-                          color: Colors.white,
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: amarelo, width: 2),
-                          ),
-                          child: ListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                'assets/logo.png',
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            title: Text(
-                              livro.titulo,
-                              style: TextStyle(
-                                color: azulEscuro,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                              softWrap: true,
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Autor: ${livro.autor}',
-                                    style: TextStyle(color: azul, fontSize: 16),
-                                    softWrap: true,
-                                  ),
-                                  Text(
-                                    'Páginas: ${livro.paginas}',
-                                    style: TextStyle(color: amarelo, fontSize: 16),
-                                    softWrap: true,
-                                  ),
-                                  Text(
-                                    'Disponibilidade: ${livro.disponivel ? "Disponível" : "Indisponível"}',
+                  : SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: livros.length,
+                        itemBuilder: (context, index) {
+                          final livro = livros[index];
+                          return GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: bege,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  title: Text(
+                                    livro.titulo,
                                     style: TextStyle(
-                                      color: livro.disponivel ? azul : magenta,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
+                                      color: azulEscuro,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    softWrap: true,
+                                    textAlign: TextAlign.center,
                                   ),
-                                ],
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Autor: ${livro.autor}', style: TextStyle(color: azul, fontSize: 16)),
+                                      Text('Páginas: ${livro.paginas}', style: TextStyle(color: amarelo, fontSize: 16)),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('Fechar', style: TextStyle(color: magenta)),
+                                      onPressed: () => Navigator.of(context).pop(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: Card(
+                              color: Colors.white,
+                              elevation: 4,
+                              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(color: amarelo, width: 2),
+                              ),
+                              child: Container(
+                                width: 140,
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.asset(
+                                        'assets/logo.png',
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      livro.titulo,
+                                      style: TextStyle(
+                                        color: azulEscuro,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  color: azul,
-                                  onPressed: () => _editarLivro(index),
-                                  tooltip: 'Editar',
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  color: magenta,
-                                  onPressed: () => _removerLivro(index),
-                                  tooltip: 'Remover',
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
             ),
           ),
