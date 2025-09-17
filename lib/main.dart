@@ -1,13 +1,189 @@
 import 'package:flutter/material.dart';
 
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  void _nextPage() {
+    if (_currentPage < 1) {
+      _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.ease);
+    } else {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bege,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  children: [
+                    _buildPage(
+                      title: 'Bem-vindo ao Garkran Reading APP',
+                      description: 'Seu sistema de livros digital. Organize, cadastre e gerencie sua leitura de forma prática.',
+                      image: 'assets/logo.png',
+                    ),
+                    _buildPage(
+                      title: 'LGPD Introdutório',
+                      description: 'Este app não coleta nem armazena dados pessoais. Sua privacidade é respeitada desde o início.',
+                      image: 'assets/branding.png',
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(2, (index) => _buildDot(index)),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: azul,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                onPressed: _nextPage,
+                child: Text(_currentPage < 1 ? 'Próximo' : 'Começar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPage({required String title, required String description, required String image}) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Image.asset(
+            image,
+            width: 120,
+            height: 120,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(height: 32),
+        Text(
+          title,
+          style: TextStyle(
+            color: azulEscuro,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+          textAlign: TextAlign.center,
+          softWrap: true,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          description,
+          style: TextStyle(
+            color: azul,
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+          softWrap: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDot(int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        color: _currentPage == index ? azul : amarelo,
+        borderRadius: BorderRadius.circular(6),
+      ),
+    );
+  }
+}
+
+
+
+
 const Color azulEscuro = Color(0xFF070743);
 const Color azul = Color(0xFF169D99);
 const Color amarelo = Color(0xFFB9CC01);
 const Color bege = Color(0xFFFAE894);
 const Color magenta = Color(0xFFAB0768);
 
+
+
+
 void main() {
   runApp(const MyApp());
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.of(context).pushReplacementNamed('/onboarding');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: azulEscuro,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 32),
+              const CircularProgressIndicator(
+                color: amarelo,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class Livro {
@@ -23,6 +199,7 @@ class Livro {
     required this.disponivel,
   });
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -48,7 +225,12 @@ class MyApp extends StatelessWidget {
           secondary: amarelo,
         ),
       ),
-      home: const LivroCrudScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
+        '/home': (context) => const LivroCrudScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }
@@ -123,97 +305,126 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
           ),
+          softWrap: true,
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 500),
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-          child: livros.isEmpty
-              ? Text(
-                  'Nenhum livro cadastrado.',
-                  style: TextStyle(
-                    color: azulEscuro,
-                    fontSize: 18,
-                  ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: livros.length,
-                  itemBuilder: (context, index) {
-                    final livro = livros[index];
-                    return Card(
-                      color: Colors.white,
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: amarelo, width: 2),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: livros.isEmpty
+                  ? Text(
+                      'Nenhum livro cadastrado.',
+                      style: TextStyle(
+                        color: azulEscuro,
+                        fontSize: 18,
                       ),
-                      child: ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                        title: Text(
-                          livro.titulo,
-                          style: TextStyle(
-                            color: azulEscuro,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: livros.length,
+                      itemBuilder: (context, index) {
+                        final livro = livros[index];
+                        return Card(
+                          color: Colors.white,
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(color: amarelo, width: 2),
                           ),
-                        ),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Autor: ${livro.autor}',
-                                style: TextStyle(color: azul, fontSize: 16),
+                          child: ListTile(
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                'assets/logo.png',
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
                               ),
-                              Text(
-                                'Páginas: ${livro.paginas}',
-                                style: TextStyle(color: amarelo, fontSize: 16),
+                            ),
+                            title: Text(
+                              livro.titulo,
+                              style: TextStyle(
+                                color: azulEscuro,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
                               ),
-                              Text(
-                                'Disponibilidade: ${livro.disponivel ? "Disponível" : "Indisponível"}',
-                                style: TextStyle(
-                                  color: livro.disponivel ? azul : magenta,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                              softWrap: true,
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Autor: ${livro.autor}',
+                                    style: TextStyle(color: azul, fontSize: 16),
+                                    softWrap: true,
+                                  ),
+                                  Text(
+                                    'Páginas: ${livro.paginas}',
+                                    style: TextStyle(color: amarelo, fontSize: 16),
+                                    softWrap: true,
+                                  ),
+                                  Text(
+                                    'Disponibilidade: ${livro.disponivel ? "Disponível" : "Indisponível"}',
+                                    style: TextStyle(
+                                      color: livro.disponivel ? azul : magenta,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  color: azul,
+                                  onPressed: () => _editarLivro(index),
+                                  tooltip: 'Editar',
                                 ),
-                              ),
-                            ],
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  color: magenta,
+                                  onPressed: () => _removerLivro(index),
+                                  tooltip: 'Remover',
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              color: azul,
-                              onPressed: () => _editarLivro(index),
-                              tooltip: 'Editar',
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              color: magenta,
-                              onPressed: () => _removerLivro(index),
-                              tooltip: 'Remover',
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                        );
+                      },
+                    ),
+            ),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _adicionarLivro,
         child: const Icon(Icons.add),
         tooltip: 'Adicionar Livro',
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Text(
+          'Este aplicativo respeita a LGPD: nenhum dado pessoal é coletado ou armazenado. Sua privacidade é garantida.',
+          style: TextStyle(color: azulEscuro, fontSize: 13),
+          textAlign: TextAlign.center,
+          softWrap: true,
+        ),
       ),
     );
   }
