@@ -125,8 +125,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 
-
-
 const Color azulEscuro = Color(0xFF070743);
 const Color azul = Color(0xFF169D99);
 const Color amarelo = Color(0xFFB9CC01);
