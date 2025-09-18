@@ -188,13 +188,13 @@ class Livro {
   String titulo;
   String autor;
   int paginas;
-  bool disponivel;
+  String imagem;
 
   Livro({
     required this.titulo,
     required this.autor,
     required this.paginas,
-    required this.disponivel,
+    required this.imagem,
   });
 }
 
@@ -247,19 +247,19 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
       titulo: 'Confissões',
       autor: 'Agostinho',
       paginas: 400,
-      disponivel: true,
+      imagem: 'assets/confissoes.png',
     ),
     Livro(
       titulo: 'Sumula Teológica',
       autor: 'Tomás de Aquino',
       paginas: 900,
-      disponivel: true,
+      imagem: 'assets/sumula.png',
     ),
     Livro(
       titulo: 'Metafísica',
       autor: 'Aristóteles',
       paginas: 350,
-      disponivel: false,
+      imagem: 'assets/metafisica.png',
     ),
   ];
 
@@ -379,7 +379,7 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
                                       child: Image.asset(
-                                        'assets/logo.png',
+                                        livro.imagem.isNotEmpty ? livro.imagem : 'assets/logo.png',
                                         width: 80,
                                         height: 80,
                                         fit: BoxFit.cover,
@@ -440,15 +440,15 @@ class _LivroDialogState extends State<LivroDialog> {
   late String titulo;
   late String autor;
   late int paginas;
-  bool disponivel = true;
+  late String imagem;
 
   @override
   void initState() {
     super.initState();
-    titulo = widget.livro?.titulo ?? '';
-    autor = widget.livro?.autor ?? '';
-    paginas = widget.livro?.paginas ?? 0;
-    disponivel = widget.livro?.disponivel ?? true;
+  titulo = widget.livro?.titulo ?? '';
+  autor = widget.livro?.autor ?? '';
+  paginas = widget.livro?.paginas ?? 0;
+  imagem = widget.livro?.imagem ?? '';
   }
 
   @override
@@ -513,19 +513,17 @@ class _LivroDialogState extends State<LivroDialog> {
                 },
                 onSaved: (value) => paginas = int.parse(value!),
               ),
-              SwitchListTile(
-                title: Text(
-                  'Disponível',
-                  style: TextStyle(color: azulEscuro),
+              TextFormField(
+                initialValue: imagem,
+                decoration: InputDecoration(
+                  labelText: 'Caminho da imagem',
+                  labelStyle: TextStyle(color: azulEscuro),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: azul),
+                  ),
                 ),
-                activeThumbColor: amarelo,
-                inactiveThumbColor: magenta,
-                value: disponivel,
-                onChanged: (value) {
-                  setState(() {
-                    disponivel = value;
-                  });
-                },
+                validator: (value) => value == null || value.isEmpty ? 'Informe o caminho da imagem' : null,
+                onSaved: (value) => imagem = value!,
               ),
             ],
           ),
@@ -551,7 +549,7 @@ class _LivroDialogState extends State<LivroDialog> {
                   titulo: titulo,
                   autor: autor,
                   paginas: paginas,
-                  disponivel: disponivel,
+                  imagem: imagem,
                 ),
               );
             }
