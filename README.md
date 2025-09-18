@@ -17,26 +17,41 @@ O **Garkran Reading APP** permite que você cadastre, edite e visualize livros d
 1. **Pré-requisitos:**  
    - [Flutter](https://docs.flutter.dev/get-started/install) instalado na sua máquina.
    - SDK do Dart incluído no Flutter.
-   - Android Studio instalado. *ou usar seu dispositivo.
+   - Android Studio instalado ou utilize seu dispositivo.
 
 2. **Clone o repositório:**
    ```sh
    git clone https://github.com/seu-usuario/seu-repo.git
    cd seu-repo
+   ```
+
+3. **Instale as dependências:**
+   ```sh
+   flutter pub get
+   ```
+
+4. **Execute o app:**
+   ```sh
+   flutter run
+   ```
 
 ## Estrutura do Projeto
-    - lib/main.dart: Código principal do aplicativo, incluindo telas, navegação e lógica do CRUD.
-    - assets/: Imagens utilizadas no app.
-    - android/, ios/, linux/, macos/, windows/, web/: Pastas de plataforma para build e execução.
+
+- `lib/main.dart`: Código principal do aplicativo, incluindo telas, navegação e lógica do CRUD.
+- `assets/`: Imagens utilizadas no app.
+- `android/`, `ios/`, `linux/`, `macos/`, `windows/`, `web/`: Pastas de plataforma para build e execução.
 
 ## Privacidade
-    Este aplicativo respeita a LGPD: nenhum dado pessoal é coletado ou armazenado. Toda a informação permanece local no seu dispositivo.
+
+Este aplicativo respeita a LGPD: nenhum dado pessoal é coletado ou armazenado. Toda a informação permanece local no seu dispositivo.
 
 ## Contribuição
-    Pablo Emanuel Cechim de Lima
-    Murilo Andre Rodrigues 
-    Tawan Vitor Silva de Oliveira
-    Gustavo Finkler Hass
+
+- Pablo Emanuel Cechim de Lima
+- Murilo Andre Rodrigues 
+- Tawan Vitor Silva de Oliveira
+- Gustavo Finkler Hass
 
 ## Licença
-    Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
