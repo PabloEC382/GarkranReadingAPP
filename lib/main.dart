@@ -657,7 +657,7 @@ class _LivroDialogState extends State<LivroDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _status,
+                initialValue: _status,
                 items: _statusOptions
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                     .toList(),
