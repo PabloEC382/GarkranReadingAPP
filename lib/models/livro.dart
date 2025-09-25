@@ -6,7 +6,7 @@ class Livro {
   int quantidadeFolhas;
   String? notas;
   String? capaPath;
-  String? status;
+  String status;
 
   Livro({
     required this.id,
@@ -16,19 +16,21 @@ class Livro {
     required this.quantidadeFolhas,
     this.notas,
     this.capaPath,
-    this.status,
+    this.status = 'Não iniciado',
   });
 
   factory Livro.fromJson(Map<String, dynamic> json) => Livro(
-        id: json['id'],
-        titulo: json['titulo'],
-        autor: json['autor'],
-        genero: json['genero'],
-        quantidadeFolhas: json['quantidadeFolhas'],
-        notas: json['notas'],
-        capaPath: json['capaPath'],
-        status: json['status'],
-      );
+    id: json['id'] ?? '',
+    titulo: json['titulo'] ?? '',
+    autor: json['autor'] ?? '',
+    genero: json['genero'] ?? '',
+    quantidadeFolhas: (json['quantidadeFolhas'] is int)
+        ? json['quantidadeFolhas']
+        : int.tryParse(json['quantidadeFolhas']?.toString() ?? '0') ?? 0,
+    notas: json['notas'],
+    capaPath: json['capaPath'],
+  );
+
 
   Map<String, dynamic> toJson() => {
         'id': id,
