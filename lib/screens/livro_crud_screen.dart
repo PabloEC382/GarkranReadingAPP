@@ -13,6 +13,8 @@ const Color azulPetroleo = Color(0xFF007C92);
 const Color azulSuave = Color(0xFF5BC0BE);
 const Color branco = Colors.white;
 
+enum LivroLayout { vertical, horizontal }
+
 class LivroCrudScreen extends StatefulWidget {
   const LivroCrudScreen({super.key});
 
@@ -22,6 +24,7 @@ class LivroCrudScreen extends StatefulWidget {
 
 class _LivroCrudScreenState extends State<LivroCrudScreen> {
   List<Livro> livros = [];
+  LivroLayout _layout = LivroLayout.vertical;
 
   @override
   void initState() {
@@ -126,6 +129,22 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
         title: const Text('Meus Livros'),
         backgroundColor: azulProfundo,
         foregroundColor: branco,
+        actions: [
+          IconButton(
+            icon: Icon(
+              _layout == LivroLayout.vertical ? Icons.view_module : Icons.view_list,
+              color: branco,
+            ),
+            tooltip: _layout == LivroLayout.vertical ? 'Visualizar em grade' : 'Visualizar em lista',
+            onPressed: () {
+              setState(() {
+                _layout = _layout == LivroLayout.vertical
+                    ? LivroLayout.horizontal
+                    : LivroLayout.vertical;
+              });
+            },
+          ),
+        ],
       ),
       body: livros.isEmpty
           ? const Center(
@@ -134,69 +153,169 @@ class _LivroCrudScreenState extends State<LivroCrudScreen> {
                 style: TextStyle(color: branco),
               ),
             )
-          : ListView.builder(
-              itemCount: livros.length,
-              itemBuilder: (context, index) {
-                final livro = livros[index];
-                Widget leadingWidget;
-                if (kIsWeb) {
-                  leadingWidget = ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      'assets/logo.png',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.contain,
-                    ),
-                  );
-                } else if (livro.capaPath != null && livro.capaPath!.isNotEmpty) {
-                  leadingWidget = ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.file(
-                      File(livro.capaPath!),
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.book, size: 40),
-                    ),
-                  );
-                } else {
-                  leadingWidget = const Icon(Icons.book, size: 40);
-                }
-                return Card(
-                  color: azulPetroleo,
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    title: Text(
-                      livro.titulo,
-                      style: const TextStyle(color: branco),
-                    ),
-                    subtitle: Text(
-                      '${livro.autor} • ${livro.status}',
-                      style: const TextStyle(color: branco),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _editarLivro(index),
+          : _layout == LivroLayout.vertical
+              ? ListView.builder(
+                  itemCount: livros.length,
+                  itemBuilder: (context, index) {
+                    final livro = livros[index];
+                    Widget leadingWidget;
+                    if (kIsWeb) {
+                      leadingWidget = ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.contain,
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _removerLivro(index),
+                      );
+                    } else if (livro.capaPath != null && livro.capaPath!.isNotEmpty) {
+                      leadingWidget = ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(livro.capaPath!),
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.book, size: 40),
                         ),
-                        if (livro.notas != null && livro.notas!.isNotEmpty)
-                          IconButton(
-                            icon: const Icon(Icons.sticky_note_2, color: Colors.amber),
-                            onPressed: () => _mostrarNotas(context, livro.notas!),
-                          ),
-                      ],
-                    ),
+                      );
+                    } else {
+                      leadingWidget = const Icon(Icons.book, size: 40);
+                    }
+                    return Card(
+                      color: azulPetroleo,
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: ListTile(
+                        leading: leadingWidget,
+                        title: Text(
+                          livro.titulo,
+                          style: const TextStyle(color: branco),
+                        ),
+                        subtitle: Text(
+                          'Autor: ${livro.autor}\n'
+                          'Gênero: ${livro.genero}\n'
+                          'Folhas: ${livro.quantidadeFolhas}',
+                          style: const TextStyle(color: branco),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () => _editarLivro(index),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _removerLivro(index),
+                            ),
+                            if (livro.notas != null && livro.notas!.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.sticky_note_2, color: Colors.amber),
+                                onPressed: () => _mostrarNotas(context, livro.notas!),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.75,
                   ),
-                );
-              },
-            ),
+                  itemCount: livros.length,
+                  itemBuilder: (context, index) {
+                    final livro = livros[index];
+                    Widget leadingWidget;
+                    if (kIsWeb) {
+                      leadingWidget = ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                        ),
+                      );
+                    } else if (livro.capaPath != null && livro.capaPath!.isNotEmpty) {
+                      leadingWidget = ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(livro.capaPath!),
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.book, size: 80),
+                        ),
+                      );
+                    } else {
+                      leadingWidget = const Icon(Icons.book, size: 80);
+                    }
+                    return Card(
+                      color: azulPetroleo,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          maxHeight: 220,
+                        ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              leadingWidget,
+                              const SizedBox(height: 8),
+                              Text(
+                                livro.titulo,
+                                style: const TextStyle(color: branco, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                livro.autor,
+                                style: const TextStyle(color: branco),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                livro.status,
+                                style: const TextStyle(color: branco, fontSize: 12),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () => _editarLivro(index),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _removerLivro(index),
+                                  ),
+                                  if (livro.notas != null && livro.notas!.isNotEmpty)
+                                    IconButton(
+                                      icon: const Icon(Icons.sticky_note_2, color: Colors.amber),
+                                      onPressed: () => _mostrarNotas(context, livro.notas!),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: _adicionarLivro,
         backgroundColor: azulSuave,

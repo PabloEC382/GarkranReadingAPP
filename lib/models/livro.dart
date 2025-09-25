@@ -1,31 +1,43 @@
 class Livro {
-  final String titulo;
-  final String autor;
-  final String? capaPath;
-  final String status;
-  final String? notas;
+  String id;
+  String titulo;
+  String autor;
+  String genero;
+  int quantidadeFolhas;
+  String? notas;
+  String? capaPath;
+  String? status;
 
   Livro({
+    required this.id,
     required this.titulo,
     required this.autor,
-    this.capaPath,
-    this.status = 'Não iniciado',
+    required this.genero,
+    required this.quantidadeFolhas,
     this.notas,
+    this.capaPath,
+    this.status,
   });
 
+  factory Livro.fromJson(Map<String, dynamic> json) => Livro(
+        id: json['id'],
+        titulo: json['titulo'],
+        autor: json['autor'],
+        genero: json['genero'],
+        quantidadeFolhas: json['quantidadeFolhas'],
+        notas: json['notas'],
+        capaPath: json['capaPath'],
+        status: json['status'],
+      );
+
   Map<String, dynamic> toJson() => {
+        'id': id,
         'titulo': titulo,
         'autor': autor,
+        'genero': genero,
+        'quantidadeFolhas': quantidadeFolhas,
+        'notas': notas,
         'capaPath': capaPath,
         'status': status,
-        'notas': notas,
       };
-
-  factory Livro.fromJson(Map<String, dynamic> json) => Livro(
-        titulo: json['titulo'] ?? '',
-        autor: json['autor'] ?? '',
-        capaPath: json['capaPath'],
-        status: json['status'] ?? 'Não iniciado',
-        notas: json['notas'],
-      );
 }

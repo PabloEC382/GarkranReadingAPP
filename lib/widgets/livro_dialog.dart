@@ -4,11 +4,18 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/livro.dart';
 
-// Certifique-se de ter as cores abaixo definidas em algum lugar acessível:
 const Color azulProfundo = Color(0xFF1A2439);
 const Color azulAcinzentado = Color(0xFF2F4A6A);
 const Color azulSuave = Color(0xFF4A6FA5);
 const Color branco = Colors.white;
+
+const List<String> generosDisponiveis = [
+  'Ação',
+  'Terror',
+  'SCI-FI',
+  'Filosofia',
+  'Aventura',
+];
 
 class LivroDialog extends StatefulWidget {
   final Livro? livro;
@@ -26,6 +33,17 @@ class _LivroDialogState extends State<LivroDialog> {
   String? _capaPath;
   String _status = 'Não iniciado';
   final List<String> _statusOptions = ['Não iniciado', 'Lendo', 'Concluído'];
+  final List<String> generos = [
+    'Ação',
+    'Terror',
+    'SCI-FI',
+    'Filosofia',
+    'Aventura',
+  ];
+
+  String? _generoSelecionado;
+
+  TextEditingController _folhasController = TextEditingController();
 
   @override
   void initState() {
@@ -35,6 +53,10 @@ class _LivroDialogState extends State<LivroDialog> {
     _notasController = TextEditingController(text: widget.livro?.notas ?? '');
     _capaPath = widget.livro?.capaPath;
     _status = widget.livro?.status ?? 'Não iniciado';
+    _generoSelecionado = widget.livro?.genero; // Se estiver editando
+    if (widget.livro != null) {
+      _folhasController.text = widget.livro!.quantidadeFolhas.toString();
+    }
   }
 
   @override
@@ -46,7 +68,7 @@ class _LivroDialogState extends State<LivroDialog> {
   }
 
   Future<void> _pickImage() async {
-    if (kIsWeb) return; // Não suporta imagem local no web
+    if (kIsWeb) return;
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -127,7 +149,7 @@ class _LivroDialogState extends State<LivroDialog> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _status,
+                initialValue: _status,
                 dropdownColor: azulProfundo,
                 style: const TextStyle(color: branco),
                 items: _statusOptions
@@ -149,6 +171,30 @@ class _LivroDialogState extends State<LivroDialog> {
                     borderSide: BorderSide(color: azulSuave),
                   ),
                 ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _generoSelecionado,
+                decoration: const InputDecoration(labelText: 'Gênero'),
+                items: generosDisponiveis
+                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _generoSelecionado = value;
+                  });
+                },
+                validator: (value) => value == null ? 'Selecione um gênero' : null,
+              ),
+              TextFormField(
+                controller: _folhasController,
+                decoration: const InputDecoration(labelText: 'Quantidade de folhas'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Informe a quantidade de folhas';
+                  if (int.tryParse(value) == null) return 'Digite um número válido';
+                  return null;
+                },
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -184,15 +230,18 @@ class _LivroDialogState extends State<LivroDialog> {
             foregroundColor: branco,
           ),
           onPressed: () {
-            if (_formKey.currentState?.validate() ?? false) {
-              final livro = Livro(
+            if (_formKey.currentState!.validate()) {
+              final novoLivro = Livro(
+                id: widget.livro?.id ?? UniqueKey().toString(),
                 titulo: _tituloController.text,
                 autor: _autorController.text,
+                genero: _generoSelecionado!,
+                quantidadeFolhas: int.parse(_folhasController.text),
+                notas: _notasController.text,
                 capaPath: _capaPath,
                 status: _status,
-                notas: _notasController.text,
               );
-              Navigator.of(context).pop(livro);
+              Navigator.of(context).pop(novoLivro);
             }
           },
           child: const Text('Salvar'),
